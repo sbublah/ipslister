@@ -5,7 +5,7 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.5.1.v20130918-rNA", date="2018-05-11T15:56:35")
+@Generated(value="EclipseLink-2.5.1.v20130918-rNA", date="2018-05-13T21:09:05")
 @StaticMetamodel(Barcode.class)
 public class Barcode_ { 
 

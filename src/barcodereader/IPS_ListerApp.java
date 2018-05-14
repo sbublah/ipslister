@@ -12,8 +12,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.proteanit.sql.DbUtils;
 /**
  *
  * @author SibusisoJ
@@ -40,6 +42,8 @@ public class IPS_ListerApp extends javax.swing.JFrame {
         btnScan = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        btnExit = new javax.swing.JButton();
+        btnLogout = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -82,6 +86,20 @@ public class IPS_ListerApp extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jTable1);
 
+        btnExit.setText("Exit");
+        btnExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExitActionPerformed(evt);
+            }
+        });
+
+        btnLogout.setText("Logout");
+        btnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogoutActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -98,7 +116,12 @@ public class IPS_ListerApp extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(txtBarcodeReader, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(37, 37, 37)
-                                .addComponent(btnScan, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(btnScan, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(73, 73, 73)
+                                .addComponent(btnExit)
+                                .addGap(50, 50, 50)
+                                .addComponent(btnLogout)))))
                 .addContainerGap(163, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -111,61 +134,98 @@ public class IPS_ListerApp extends javax.swing.JFrame {
                     .addComponent(txtBarcodeReader))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(82, 82, 82))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnLogout)
+                    .addComponent(btnExit))
+                .addGap(41, 41, 41))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    
+    
     private void btnScanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnScanActionPerformed
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
-        Connection c = null;
-        Statement stmt = null;
+        Connection con = null;
+    Statement stmt = null;
+   
         
     String query = "insert into barcode (BarcodeReader,Date) values ('"+txtBarcodeReader.getText()+"','"+now+"')";
     System.out.println(query);
-       try {
-    c = DBClass.getConnection();
-    stmt = c.createStatement();
+       try   {
+    con = DBClass.getConnection();
+    stmt = con.createStatement();
     stmt.execute(query);
     JOptionPane.showMessageDialog(this, "Saved");
-    } catch (Exception e) {
+    } 
+        catch (Exception e) {
         /*e.printStackTrace ();*/
+     JOptionPane.showMessageDialog(this, "Saved");
     }
     
-  
+       
         /*DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.addRow(new Object[]{txtBarcodeReader.getText(),now});*/
         
-
-             
+   showTableData();            
  DefaultTableModel model =new DefaultTableModel(new String[]{"ID", "BarcodeReader", "Date"}, 0); 
     
-String sql = "SELECT * FROM barcode";
-ResultSet rs;
-        try {
-            rs = stmt.executeQuery(sql);
-            while(rs.next())
-            {
-                String d = rs.getString("ID");
-                String e = rs.getString("BarcodeReader");
-                String f = rs.getString("Date");
-                model.addRow(new Object[]{d, e, f});
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(IPS_ListerApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-
+ /*String sql = "SELECT * FROM barcode";
+ ResultSet rs;
+ try {
+ rs = stmt.executeQuery(sql);
+ if(rs.next())
+ {
+ String d = rs.getString("ID");
+ String e = rs.getString("BarcodeReader");
+ String f = rs.getString("Date");
+ model.addRow(new Object[]{d, e, f});
+ }
+ 
+ } catch (SQLException ex) {
+ Logger.getLogger(IPS_ListerApp.class.getName()).log(Level.SEVERE, null, ex);
+ }
+ */
    
         txtBarcodeReader.setText("");
     }//GEN-LAST:event_btnScanActionPerformed
 
+     public void showTableData(){
+    
+    Connection con = null;
+    PreparedStatement pst = null;
+    ResultSet rs = null;
+    try{
+    con = DriverManager.getConnection("jdbc:mysql://localhost:3306/barcodereader?zeroDateTimeBehavior=convertToNull", "ips", "ips");
+    String sql = "SELECT * FROM barcode";
+    pst = con.prepareStatement(sql);
+    rs=pst.executeQuery();
+    jTable1.setModel(DbUtils.resultSetToTableModel(rs));
+    }
+    catch(SQLException ex){
+    JOptionPane.showMessageDialog(null, ex);
+    
+    }
+    
+    }
     private void txtBarcodeReaderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBarcodeReaderActionPerformed
 
           
     }//GEN-LAST:event_txtBarcodeReaderActionPerformed
+
+    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
+
+ this.dispose();
+    }//GEN-LAST:event_btnExitActionPerformed
+
+    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+        
+        this.setVisible(false);
+        new Login().setVisible(true);
+    }//GEN-LAST:event_btnLogoutActionPerformed
 
 
     /**
@@ -202,6 +262,8 @@ ResultSet rs;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnExit;
+    private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnScan;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;

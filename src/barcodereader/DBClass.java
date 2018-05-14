@@ -21,7 +21,7 @@ public class DBClass {
         if(connection == null){
             //JDBC
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/barcodereader", "ips", "ips");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/barcodereader?zeroDateTimeBehavior=convertToNull", "ips", "ips");
         }
         return connection;
     }
